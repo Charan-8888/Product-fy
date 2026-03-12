@@ -4,1307 +4,201 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MultiStore Hub – Sell Everywhere With One Upload</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --primary: #2563eb;
-    --secondary: #9333ea;
-    --bg: #0f172a;
-    --card: #1e293b;
-    --text: #ffffff;
-    --text-muted: #94a3b8;
-    --border: rgba(255,255,255,0.08);
-    --glow-blue: rgba(37,99,235,0.4);
-    --glow-purple: rgba(147,51,234,0.4);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-    line-height: 1.6;
-  }
-
-  /* ─── SCROLLBAR ─── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
-
-  /* ─── NAVBAR ─── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 1000;
-    padding: 0 5%;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(15,23,42,0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.3s;
-  }
-
-  .nav-logo {
-    font-size: 1.35rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-  }
-
-  .nav-logo span { color: var(--text); -webkit-text-fill-color: var(--text); }
-
-  .nav-links {
-    display: flex;
-    gap: 2.2rem;
-    list-style: none;
-  }
-
-  .nav-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    position: relative;
-    transition: color 0.3s;
-    padding-bottom: 4px;
-  }
-
-  .nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 0; height: 2px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    transition: width 0.3s;
-    border-radius: 2px;
-  }
-
-  .nav-links a:hover { color: var(--text); }
-  .nav-links a:hover::after { width: 100%; }
-
-  .nav-cta {
-    padding: 0.55rem 1.4rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-  }
-
-  .nav-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--glow-blue);
-  }
-
-  .hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-    padding: 4px;
-  }
-
-  .hamburger span {
-    display: block;
-    width: 25px; height: 2px;
-    background: var(--text);
-    border-radius: 2px;
-    transition: all 0.3s;
-  }
-
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 70px; left: 0; right: 0;
-    background: rgba(15,23,42,0.97);
-    backdrop-filter: blur(20px);
-    padding: 1.5rem 5%;
-    border-bottom: 1px solid var(--border);
-    z-index: 999;
-    flex-direction: column;
-    gap: 1.2rem;
-  }
-
-  .mobile-menu a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: color 0.3s;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mobile-menu a:hover { color: var(--text); }
-  .mobile-menu.open { display: flex; }
-
-  /* ─── HERO ─── */
-  #home {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: 100px 5% 60px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(147,51,234,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 60% 80%, rgba(37,99,235,0.08) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  .particles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .particle {
-    position: absolute;
-    border-radius: 50%;
-    background: var(--primary);
-    opacity: 0.15;
-    animation: drift linear infinite;
-  }
-
-  @keyframes drift {
-    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.15; }
-    90% { opacity: 0.15; }
-    100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
-  }
-
-  .hero-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-left { animation: fadeInLeft 0.8s ease forwards; }
-
-  @keyframes fadeInLeft {
-    from { opacity: 0; transform: translateX(-40px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 1rem;
-    background: rgba(37,99,235,0.15);
-    border: 1px solid rgba(37,99,235,0.3);
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #60a5fa;
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.5px;
-  }
-
-  .hero-badge::before {
-    content: '●';
-    color: #22c55e;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  .hero-title {
-    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 1.2rem;
-    letter-spacing: -1.5px;
-  }
-
-  .hero-title .gradient-text {
-    background: linear-gradient(135deg, #60a5fa, var(--secondary), #f472b6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero-subtitle {
-    font-size: 1.05rem;
-    color: var(--text-muted);
-    margin-bottom: 2.2rem;
-    max-width: 480px;
-    line-height: 1.75;
-    font-weight: 400;
-  }
-
-  .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-  .btn-primary {
-    padding: 0.85rem 2rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 35px var(--glow-blue);
-  }
-
-  .btn-secondary {
-    padding: 0.85rem 2rem;
-    background: transparent;
-    color: var(--text);
-    border: 1.5px solid var(--border);
-    border-radius: 50px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s;
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--primary);
-    background: rgba(37,99,235,0.1);
-    transform: translateY(-2px);
-  }
-
-  /* Hero illustration */
-  .hero-right {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeInRight 0.8s ease 0.2s both;
-  }
-
-  @keyframes fadeInRight {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .hero-illustration {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .flow-diagram {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .flow-merchant {
-    background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(147,51,234,0.2));
-    border: 1.5px solid rgba(37,99,235,0.4);
-    border-radius: 16px;
-    padding: 1.2rem 2rem;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1rem;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 30px rgba(37,99,235,0.2);
-    position: relative;
-  }
-
-  .flow-merchant .icon { font-size: 2rem; margin-bottom: 0.3rem; }
-
-  .flow-arrow {
-    font-size: 1.5rem;
-    color: var(--primary);
-    animation: bounceDown 1.5s infinite;
-  }
-
-  @keyframes bounceDown {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
-  }
-
-  .flow-platform {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 16px;
-    padding: 1.2rem 2.5rem;
-    text-align: center;
-    font-weight: 800;
-    font-size: 1.05rem;
-    box-shadow: 0 0 40px var(--glow-blue), 0 0 40px var(--glow-purple);
-    position: relative;
-  }
-
-  .flow-platform::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 18px;
-    z-index: -1;
-    filter: blur(12px);
-    opacity: 0.5;
-  }
-
-  .flow-marketplaces {
-    display: flex;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 0.5rem;
-  }
-
-  .market-float-card {
-    background: rgba(30,41,59,0.9);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0.7rem 1rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-
-  .market-float-card:nth-child(1) { animation: float1 3s ease-in-out infinite; }
-  .market-float-card:nth-child(2) { animation: float2 3.5s ease-in-out infinite; }
-  .market-float-card:nth-child(3) { animation: float3 4s ease-in-out infinite; }
-  .market-float-card:nth-child(4) { animation: float1 3.2s ease-in-out infinite 0.5s; }
-
-  @keyframes float1 {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-  }
-  @keyframes float2 {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-12px); }
-  }
-  @keyframes float3 {
-    0%, 100% { transform: translateY(-5px); }
-    50% { transform: translateY(5px); }
-  }
-
-  .market-float-card .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-  }
-
-  /* ─── SECTIONS GENERAL ─── */
-  section { padding: 90px 5%; }
-
-  .section-header {
-    text-align: center;
-    margin-bottom: 4rem;
-  }
-
-  .section-badge {
-    display: inline-block;
-    padding: 0.35rem 1rem;
-    background: rgba(37,99,235,0.12);
-    border: 1px solid rgba(37,99,235,0.25);
-    border-radius: 50px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #60a5fa;
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .section-title {
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 0.8rem;
-    line-height: 1.2;
-  }
-
-  .section-subtitle {
-    font-size: 1rem;
-    color: var(--text-muted);
-    max-width: 550px;
-    margin: 0 auto;
-    line-height: 1.75;
-  }
-
-  .container { max-width: 1200px; margin: 0 auto; }
-
-  /* ─── FEATURES ─── */
-  #features { background: rgba(30,41,59,0.3); }
-
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .feature-card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 2rem;
-    border: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-    cursor: default;
-  }
-
-  .feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .feature-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(37,99,235,0.2);
-  }
-
-  .feature-card:hover::before { opacity: 1; }
-
-  .feature-icon {
-    width: 56px; height: 56px;
-    background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(147,51,234,0.15));
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    margin-bottom: 1.2rem;
-    border: 1px solid rgba(37,99,235,0.2);
-  }
-
-  .feature-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-  }
-
-  .feature-desc {
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-  }
-
-  /* ─── HOW IT WORKS ─── */
-  #how-it-works { position: relative; }
-
-  .steps-container {
-    display: flex;
-    gap: 0;
-    max-width: 1000px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .steps-container::before {
-    content: '';
-    position: absolute;
-    top: 50px;
-    left: calc(16.67% + 20px);
-    right: calc(16.67% + 20px);
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    z-index: 0;
-  }
-
-  .step-card {
-    flex: 1;
-    text-align: center;
-    padding: 0 1.5rem;
-    position: relative;
-    z-index: 1;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s, transform 0.6s;
-  }
-
-  .step-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .step-card:nth-child(2) { transition-delay: 0.2s; }
-  .step-card:nth-child(3) { transition-delay: 0.4s; }
-
-  .step-number {
-    width: 60px; height: 60px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: 800;
-    margin: 0 auto 1.5rem;
-    position: relative;
-    box-shadow: 0 0 0 8px rgba(37,99,235,0.1), 0 0 0 16px rgba(37,99,235,0.05);
-  }
-
-  .step-icon { font-size: 1.5rem; }
-
-  .step-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-  }
-
-  .step-desc {
-    font-size: 0.87rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-  }
-
-  /* ─── DASHBOARD PREVIEW ─── */
-  #dashboard { background: rgba(30,41,59,0.3); }
-
-  .dashboard-wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    background: var(--card);
-    border-radius: 24px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-  }
-
-  .dashboard-bar {
-    background: rgba(15,23,42,0.8);
-    padding: 0.9rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .dot-red { width: 12px; height: 12px; border-radius: 50%; background: #ef4444; }
-  .dot-yellow { width: 12px; height: 12px; border-radius: 50%; background: #f59e0b; }
-  .dot-green { width: 12px; height: 12px; border-radius: 50%; background: #22c55e; }
-
-  .bar-title {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-left: 1rem;
-    font-weight: 500;
-  }
-
-  .dashboard-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-
-  .dashboard-stats {
-    padding: 2rem;
-    border-right: 1px solid var(--border);
-  }
-
-  .stats-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1.2rem;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .stat-card {
-    background: rgba(15,23,42,0.6);
-    border-radius: 14px;
-    padding: 1.2rem;
-    border: 1px solid var(--border);
-    transition: transform 0.2s;
-  }
-
-  .stat-card:hover { transform: scale(1.03); }
-
-  .stat-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-
-  .stat-value {
-    font-size: 1.6rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    margin-bottom: 0.3rem;
-  }
-
-  .stat-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-
-  .dashboard-form { padding: 2rem; }
-
-  .form-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1.2rem;
-  }
-
-  .form-group { margin-bottom: 1rem; }
-
-  .form-group label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 0.4rem;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: 0.7rem 1rem;
-    background: rgba(15,23,42,0.7);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
-
-  .form-group select option { background: #1e293b; }
-  .form-group textarea { resize: vertical; min-height: 70px; }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-
-  .upload-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1rem;
-    background: rgba(37,99,235,0.1);
-    border: 1.5px dashed rgba(37,99,235,0.4);
-    border-radius: 10px;
-    color: #60a5fa;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .upload-btn:hover {
-    background: rgba(37,99,235,0.2);
-    border-style: solid;
-  }
-
-  .submit-btn {
-    width: 100%;
-    padding: 0.85rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    margin-top: 0.5rem;
-  }
-
-  .submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--glow-blue);
-  }
-
-  /* ─── INTEGRATIONS ─── */
-  #integrations {
-    text-align: center;
-  }
-
-  .integrations-grid {
-    display: flex;
-    gap: 1.2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .integration-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: default;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .integration-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.3s;
-    border-radius: 16px;
-  }
-
-  .integration-card:nth-child(1)::before { background: radial-gradient(circle at center, rgba(255,153,0,0.1), transparent 70%); }
-  .integration-card:nth-child(2)::before { background: radial-gradient(circle at center, rgba(39,170,225,0.1), transparent 70%); }
-  .integration-card:nth-child(3)::before { background: radial-gradient(circle at center, rgba(225,43,57,0.1), transparent 70%); }
-  .integration-card:nth-child(4)::before { background: radial-gradient(circle at center, rgba(0,117,211,0.1), transparent 70%); }
-  .integration-card:nth-child(5)::before { background: radial-gradient(circle at center, rgba(150,74,214,0.1), transparent 70%); }
-
-  .integration-card:hover {
-    transform: translateY(-5px) scale(1.03);
-    border-color: rgba(37,99,235,0.4);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3), 0 0 20px var(--glow-blue);
-  }
-
-  .integration-card:hover::before { opacity: 1; }
-
-  .integration-logo { font-size: 1.8rem; }
-
-  .integration-name { font-size: 1rem; font-weight: 700; }
-
-  /* ─── TESTIMONIALS ─── */
-  #testimonials { background: rgba(30,41,59,0.3); }
-
-  .testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .testimonial-card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 2rem;
-    border: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s, transform 0.6s, box-shadow 0.3s;
-  }
-
-  .testimonial-card.visible { opacity: 1; transform: translateY(0); }
-
-  .testimonial-card:nth-child(2) { transition-delay: 0.15s; }
-  .testimonial-card:nth-child(3) { transition-delay: 0.3s; }
-
-  .testimonial-card:hover {
-    box-shadow: 0 15px 50px rgba(0,0,0,0.3), 0 0 0 1px rgba(37,99,235,0.2);
-  }
-
-  .quote-mark {
-    font-size: 4rem;
-    line-height: 0.8;
-    color: var(--primary);
-    opacity: 0.3;
-    font-family: Georgia, serif;
-    margin-bottom: 0.5rem;
-  }
-
-  .testimonial-text {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    font-style: italic;
-  }
-
-  .testimonial-author {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .author-avatar {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-
-  .author-name { font-weight: 700; font-size: 0.9rem; }
-  .author-biz { font-size: 0.78rem; color: var(--text-muted); }
-
-  .stars { color: #f59e0b; font-size: 0.85rem; margin-bottom: 0.2rem; }
-
-  /* ─── PRICING ─── */
-  #pricing { text-align: center; }
-
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .pricing-card {
-    background: var(--card);
-    border-radius: 24px;
-    padding: 2.5rem 2rem;
-    border: 1px solid var(--border);
-    transition: transform 0.3s, box-shadow 0.3s;
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s, transform 0.6s, box-shadow 0.3s;
-  }
-
-  .pricing-card.visible { opacity: 1; transform: translateY(0); }
-  .pricing-card:nth-child(2) { transition-delay: 0.15s; }
-  .pricing-card:nth-child(3) { transition-delay: 0.3s; }
-
-  .pricing-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-  }
-
-  .pricing-card.popular {
-    border-color: var(--primary);
-    background: linear-gradient(145deg, rgba(37,99,235,0.08), rgba(147,51,234,0.08));
-  }
-
-  .pricing-card.popular:hover {
-    box-shadow: 0 25px 60px rgba(0,0,0,0.4), 0 0 40px var(--glow-blue);
-  }
-
-  .popular-badge {
-    position: absolute;
-    top: 1.2rem; right: 1.2rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 50px;
-    padding: 0.25rem 0.8rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-
-  .plan-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-
-  .plan-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
-  }
-
-  .plan-desc {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
-
-  .plan-price {
-    margin-bottom: 1.5rem;
-  }
-
-  .price-amount {
-    font-size: 2.8rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -2px;
-  }
-
-  .price-period {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-
-  .plan-features {
-    list-style: none;
-    margin-bottom: 2rem;
-    text-align: left;
-  }
-
-  .plan-features li {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    padding: 0.4rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .plan-features li::before {
-    content: '✓';
-    width: 20px; height: 20px;
-    background: rgba(37,99,235,0.15);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #60a5fa;
-    font-size: 0.7rem;
-    font-weight: 800;
-    flex-shrink: 0;
-  }
-
-  .plan-btn {
-    width: 100%;
-    padding: 0.85rem;
-    background: transparent;
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .pricing-card.popular .plan-btn {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none;
-  }
-
-  .plan-btn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-color: transparent;
-    box-shadow: 0 8px 25px var(--glow-blue);
-  }
-
-  /* ─── CONTACT ─── */
-  #contact { background: rgba(30,41,59,0.3); }
-
-  .contact-wrap {
-    max-width: 700px;
-    margin: 0 auto;
-    background: var(--card);
-    border-radius: 24px;
-    border: 1px solid var(--border);
-    padding: 3rem;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-
-  .contact-fields { display: flex; flex-direction: column; gap: 1.2rem; }
-
-  .contact-fields input,
-  .contact-fields textarea {
-    width: 100%;
-    padding: 0.9rem 1.2rem;
-    background: rgba(15,23,42,0.7);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .contact-fields input:focus,
-  .contact-fields textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
-
-  .contact-fields textarea { resize: vertical; min-height: 130px; }
-
-  .contact-submit {
-    padding: 0.9rem 2.5rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    align-self: flex-start;
-  }
-
-  .contact-submit:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 35px var(--glow-blue);
-  }
-
-  .error-msg { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; display: none; }
-  .error-msg.show { display: block; }
-
-  /* ─── FOOTER ─── */
-  footer {
-    background: rgba(15,23,42,0.95);
-    border-top: 1px solid var(--border);
-    padding: 3rem 5% 2rem;
-  }
-
-  .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 3rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .footer-brand .nav-logo { font-size: 1.2rem; display: block; margin-bottom: 0.8rem; }
-
-  .footer-tagline {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-    margin-bottom: 1.2rem;
-  }
-
-  .social-links { display: flex; gap: 0.8rem; }
-
-  .social-link {
-    width: 36px; height: 36px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-  }
-
-  .social-link:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: #fff;
-    transform: translateY(-2px);
-  }
-
-  .footer-col h4 {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    margin-bottom: 1.2rem;
-  }
-
-  .footer-col ul { list-style: none; }
-
-  .footer-col ul li { margin-bottom: 0.6rem; }
-
-  .footer-col ul li a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.88rem;
-    transition: color 0.2s;
-  }
-
-  .footer-col ul li a:hover { color: var(--text); }
-
-  .footer-bottom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 900px) {
-    .hero-content { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; }
-    .hero-left { text-align: center; }
-    .hero-buttons { justify-content: center; }
-    .hero-subtitle { margin: 0 auto 2.2rem; }
-    .steps-container { flex-direction: column; gap: 2rem; }
-    .steps-container::before { display: none; }
-    .dashboard-body { grid-template-columns: 1fr; }
-    .dashboard-stats { border-right: none; border-bottom: 1px solid var(--border); }
-    .footer-content { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .nav-links { display: none; }
-    .hamburger { display: flex; }
-  }
-
-  @media (max-width: 600px) {
-    nav { padding: 0 4%; }
-    section { padding: 70px 4%; }
-    .contact-wrap { padding: 2rem; }
-    .footer-content { grid-template-columns: 1fr; }
-    .form-row { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .flow-marketplaces { gap: 0.5rem; }
-    .market-float-card { padding: 0.5rem 0.8rem; font-size: 0.75rem; }
-  }
-
-  /* ─── NOTIFICATION TOAST ─── */
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: var(--card);
-    border: 1px solid #22c55e;
-    border-radius: 14px;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px rgba(34,197,94,0.2);
-    z-index: 9999;
-    transform: translateX(200%);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    max-width: 340px;
-  }
-
-  .toast.show { transform: translateX(0); }
-
-  .toast-icon { font-size: 1.4rem; }
-  .toast-text { font-size: 0.88rem; font-weight: 500; line-height: 1.4; }
-  .toast-title { font-weight: 700; font-size: 0.9rem; color: #22c55e; margin-bottom: 0.2rem; }
-
-  /* ─── STATS BANNER ─── */
-  .stats-banner {
-    background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(147,51,234,0.1));
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 2.5rem 5%;
-  }
-
-  .stats-banner-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    text-align: center;
-    gap: 2rem;
-  }
-
-  .banner-stat-value {
-    font-size: 2.2rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -1px;
-  }
-
-  .banner-stat-label {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-top: 0.2rem;
-    font-weight: 500;
-  }
-
-  @media (max-width: 700px) {
-    .stats-banner-inner { grid-template-columns: 1fr 1fr; }
-  }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--card:#ffffff}
+body{font-family:'Poppins',sans-serif;background:#fff;color:var(--text);overflow-x:hidden;line-height:1.6}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:68px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--border)}
+.nav-logo{font-size:1.3rem;font-weight:800;color:var(--primary)}
+.nav-logo span{color:var(--text)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.9rem;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:0.5rem 1.3rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;text-decoration:none}
+.nav-cta:hover{background:var(--primary-dark)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+.hamburger span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px}
+.mobile-menu{display:none;position:fixed;top:68px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1.2rem 5%;flex-direction:column;gap:1rem;z-index:999}
+.mobile-menu a{color:var(--muted);text-decoration:none;font-size:0.95rem;font-weight:500;padding:0.4rem 0;border-bottom:1px solid var(--border)}
+.mobile-menu a:hover{color:var(--text)}
+.mobile-menu.open{display:flex}
+
+/* HERO */
+#home{min-height:100vh;display:flex;align-items:center;padding:100px 5% 60px;background:var(--bg)}
+.hero-content{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;max-width:1200px;margin:0 auto;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;font-size:0.8rem;font-weight:600;color:var(--primary);margin-bottom:1.5rem}
+.hero-badge::before{content:'●';color:#16a34a}
+.hero-title{font-size:2.8rem;font-weight:800;line-height:1.15;margin-bottom:1.2rem;color:var(--text)}
+.hero-title .hl{color:var(--primary)}
+.hero-subtitle{font-size:1rem;color:var(--muted);margin-bottom:2rem;max-width:480px;line-height:1.75}
+.hero-buttons{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{padding:0.8rem 1.8rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{padding:0.8rem 1.8rem;background:#fff;color:var(--text);border:1px solid var(--border);border-radius:6px;font-family:'Poppins',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+.hero-right{display:flex;align-items:center;justify-content:center}
+.flow-diagram{display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%;max-width:400px}
+.flow-merchant{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.2rem 2rem;text-align:center;font-weight:700;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.flow-merchant .icon{font-size:2rem;margin-bottom:0.3rem}
+.flow-arrow{font-size:1.4rem;color:var(--primary)}
+.flow-platform{background:var(--primary);color:#fff;border-radius:10px;padding:1.1rem 2.5rem;text-align:center;font-weight:700}
+.flow-markets{display:flex;gap:0.7rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem}
+.mcard{background:#fff;border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.85rem;font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:0.4rem;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.dot{width:8px;height:8px;border-radius:50%}
+
+/* SECTIONS */
+section{padding:80px 5%}
+.sec-head{text-align:center;margin-bottom:3.5rem}
+.sec-badge{display:inline-block;padding:0.3rem 1rem;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;font-size:0.78rem;font-weight:600;color:var(--primary);margin-bottom:1rem;text-transform:uppercase}
+.sec-title{font-size:2.2rem;font-weight:800;margin-bottom:0.8rem;line-height:1.2;color:var(--text)}
+.sec-sub{font-size:0.98rem;color:var(--muted);max-width:550px;margin:0 auto;line-height:1.75}
+
+/* STATS BANNER */
+.stats-banner{background:#eff6ff;border-top:1px solid #bfdbfe;border-bottom:1px solid #bfdbfe;padding:2.5rem 5%}
+.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);text-align:center;gap:2rem}
+.stat-val{font-size:2rem;font-weight:800;color:var(--primary)}
+.stat-lbl{font-size:0.82rem;color:var(--muted);margin-top:0.2rem;font-weight:500}
+
+/* FEATURES */
+#features{background:var(--bg)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;max-width:1200px;margin:0 auto}
+.feature-card{background:#fff;border-radius:10px;padding:1.8rem;border:1px solid var(--border)}
+.feature-card:hover{border-color:#93c5fd}
+.feature-icon{width:50px;height:50px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.1rem}
+.feature-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--text)}
+.feature-desc{font-size:0.88rem;color:var(--muted);line-height:1.7}
+
+/* HOW IT WORKS */
+#how-it-works{background:#fff}
+.steps-container{display:flex;max-width:1000px;margin:0 auto;position:relative}
+.steps-container::before{content:'';position:absolute;top:30px;left:calc(16.67% + 20px);right:calc(16.67% + 20px);height:2px;background:#bfdbfe}
+.step-card{flex:1;text-align:center;padding:0 1.5rem;position:relative;z-index:1}
+.step-num{width:60px;height:60px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 1.2rem;color:#fff}
+.step-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--text)}
+.step-desc{font-size:0.87rem;color:var(--muted);line-height:1.7}
+
+/* DASHBOARD */
+#dashboard{background:var(--bg)}
+.dash-wrap{max-width:1100px;margin:0 auto;background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.dash-bar{background:#f1f5f9;padding:0.85rem 1.5rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid var(--border)}
+.dot-r{width:12px;height:12px;border-radius:50%;background:#ef4444}
+.dot-y{width:12px;height:12px;border-radius:50%;background:#f59e0b}
+.dot-g{width:12px;height:12px;border-radius:50%;background:#22c55e}
+.bar-title{font-size:0.8rem;color:var(--muted);margin-left:1rem;font-weight:500}
+.dash-body{display:grid;grid-template-columns:1fr 1fr}
+.dash-stats{padding:2rem;border-right:1px solid var(--border)}
+.stats-title{font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:1.2rem}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--bg);border-radius:8px;padding:1.1rem;border:1px solid var(--border)}
+.s-icon{font-size:1.4rem;margin-bottom:0.4rem}
+.s-val{font-size:1.5rem;font-weight:800;color:var(--primary);line-height:1;margin-bottom:0.2rem}
+.s-lbl{font-size:0.75rem;color:var(--muted);font-weight:500}
+.dash-form{padding:2rem}
+.form-title{font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:1.2rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.4rem}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.7rem 1rem;background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Poppins',sans-serif;font-size:0.85rem;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary)}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.7rem 1rem;background:#f8fafc;border:1px dashed #93c5fd;border-radius:6px;color:var(--primary);font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;width:100%}
+.upload-btn:hover{background:#eff6ff}
+.submit-btn{width:100%;padding:0.85rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.5rem}
+.submit-btn:hover{background:var(--primary-dark)}
+
+/* INTEGRATIONS */
+#integrations{background:#fff;text-align:center}
+.integ-grid{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.integ-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.8rem;display:flex;align-items:center;gap:0.8rem;font-weight:700;font-size:0.95rem;color:var(--text)}
+.integ-card:hover{border-color:#93c5fd;background:#f8fafc}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--bg)}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;max-width:1100px;margin:0 auto}
+.test-card{background:#fff;border-radius:10px;padding:1.8rem;border:1px solid var(--border)}
+.quote{font-size:3rem;line-height:0.8;color:#bfdbfe;font-family:Georgia,serif;margin-bottom:0.5rem}
+.test-text{font-size:0.9rem;color:var(--muted);line-height:1.8;margin-bottom:1.5rem;font-style:italic}
+.test-author{display:flex;align-items:center;gap:0.8rem}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.95rem;color:#fff;flex-shrink:0}
+.author-name{font-weight:700;font-size:0.9rem;color:var(--text)}
+.author-biz{font-size:0.78rem;color:var(--muted)}
+.stars{color:#f59e0b;font-size:0.85rem;margin-bottom:0.2rem}
+
+/* PRICING */
+#pricing{background:var(--bg);text-align:center}
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto}
+.price-card{background:#fff;border-radius:10px;padding:2.5rem 2rem;border:1px solid var(--border);position:relative}
+.price-card:hover{border-color:#93c5fd}
+.price-card.popular{border-color:var(--primary);border-width:2px}
+.pop-badge{position:absolute;top:1.2rem;right:1.2rem;background:var(--primary);color:#fff;border-radius:20px;padding:0.2rem 0.8rem;font-size:0.7rem;font-weight:700}
+.plan-icon{font-size:2.2rem;margin-bottom:1rem}
+.plan-name{font-size:1.1rem;font-weight:700;margin-bottom:0.3rem;color:var(--text)}
+.plan-desc{font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem}
+.plan-price{margin-bottom:1.5rem}
+.price-amt{font-size:2.6rem;font-weight:800;color:var(--text)}
+.price-per{font-size:0.85rem;color:var(--muted);font-weight:500}
+.plan-features{list-style:none;margin-bottom:2rem;text-align:left}
+.plan-features li{display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;color:var(--muted);padding:0.5rem 0;border-bottom:1px solid var(--border)}
+.plan-features li::before{content:'✓';color:var(--primary);font-weight:700;font-size:0.85rem;flex-shrink:0}
+.plan-btn{width:100%;padding:0.85rem;background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer}
+.plan-btn:hover,.price-card.popular .plan-btn{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* CONTACT */
+#contact{background:#fff}
+.contact-wrap{max-width:680px;margin:0 auto;background:var(--bg);border-radius:10px;border:1px solid var(--border);padding:2.5rem}
+.contact-fields{display:flex;flex-direction:column;gap:1.2rem}
+.contact-fields input,.contact-fields textarea{width:100%;padding:0.85rem 1.1rem;background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none}
+.contact-fields input:focus,.contact-fields textarea:focus{border-color:var(--primary)}
+.contact-fields textarea{resize:vertical;min-height:130px}
+.contact-submit{padding:0.85rem 2.5rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;align-self:flex-start}
+.contact-submit:hover{background:var(--primary-dark)}
+
+/* FOOTER */
+footer{background:#1e293b;color:#cbd5e1;padding:3rem 5% 2rem}
+.footer-content{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2rem}
+.footer-brand .nav-logo{font-size:1.2rem;display:block;margin-bottom:0.8rem;color:#60a5fa}
+.footer-brand .nav-logo span{color:#fff}
+.footer-tag{font-size:0.85rem;color:#94a3b8;line-height:1.7;margin-bottom:1.2rem}
+.social-links{display:flex;gap:0.8rem}
+.social-link{width:34px;height:34px;background:#334155;border:1px solid #475569;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;text-decoration:none;font-size:0.85rem}
+.social-link:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+.footer-col h4{font-size:0.82rem;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:1.1rem;letter-spacing:0.5px}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:0.6rem}
+.footer-col ul li a{color:#94a3b8;text-decoration:none;font-size:0.87rem}
+.footer-col ul li a:hover{color:#fff}
+.footer-bottom{max-width:1200px;margin:0 auto;padding-top:1.5rem;border-top:1px solid #334155;display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:#64748b;flex-wrap:wrap;gap:1rem}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-content,.dash-body{grid-template-columns:1fr}
+  .hero-left{text-align:center}
+  .hero-buttons{justify-content:center}
+  .hero-subtitle{margin:0 auto 2rem}
+  .steps-container{flex-direction:column;gap:2rem}
+  .steps-container::before{display:none}
+  .dash-stats{border-right:none;border-bottom:1px solid var(--border)}
+  .footer-content{grid-template-columns:1fr 1fr;gap:2rem}
+  .nav-links,.nav-cta{display:none}
+  .hamburger{display:flex}
+}
+@media(max-width:600px){
+  section{padding:60px 4%}
+  .contact-wrap{padding:1.5rem}
+  .footer-content{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .hero-title{font-size:2rem}
+  .sec-title{font-size:1.8rem}
+}
+@media(max-width:700px){.stats-inner{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 
-<!-- ─── TOAST ─── -->
-<div class="toast" id="toast">
-  <div class="toast-icon">🎉</div>
-  <div class="toast-text">
-    <div class="toast-title">Product Uploaded!</div>
-    Sent to Amazon, Flipkart, Meesho & more.
-  </div>
-</div>
-
-<!-- ─── NAV ─── -->
-<nav id="navbar">
+<nav>
   <div class="nav-logo">MultiStore<span> Hub</span></div>
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
@@ -1314,236 +208,107 @@
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="#dashboard" class="nav-cta">Get Started</a>
-  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-    <span></span><span></span><span></span>
-  </div>
+  <div class="hamburger" id="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')"><span></span><span></span><span></span></div>
 </nav>
-
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#home" onclick="closeMenu()">Home</a>
-  <a href="#features" onclick="closeMenu()">Features</a>
-  <a href="#how-it-works" onclick="closeMenu()">How It Works</a>
-  <a href="#testimonials" onclick="closeMenu()">Merchants</a>
-  <a href="#contact" onclick="closeMenu()">Contact</a>
-  <a href="#dashboard" class="nav-cta" style="margin-top:0.5rem; text-align:center;" onclick="closeMenu()">Get Started</a>
+  <a href="#home" onclick="document.getElementById('mobileMenu').classList.remove('open')">Home</a>
+  <a href="#features" onclick="document.getElementById('mobileMenu').classList.remove('open')">Features</a>
+  <a href="#how-it-works" onclick="document.getElementById('mobileMenu').classList.remove('open')">How It Works</a>
+  <a href="#testimonials" onclick="document.getElementById('mobileMenu').classList.remove('open')">Merchants</a>
+  <a href="#contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Contact</a>
+  <a href="#dashboard" onclick="document.getElementById('mobileMenu').classList.remove('open')" style="color:var(--primary);font-weight:600">Get Started</a>
 </div>
 
-<!-- ─── HERO ─── -->
 <section id="home">
-  <div class="hero-bg"></div>
-  <div class="particles" id="particles"></div>
   <div class="hero-content">
     <div class="hero-left">
       <div class="hero-badge">✦ New Platform for Sellers</div>
-      <h1 class="hero-title">
-        Sell Everywhere<br>With <span class="gradient-text">One Upload</span>
-      </h1>
-      <p class="hero-subtitle">
-        Upload your product once and distribute it automatically to marketplaces like Amazon, Flipkart, Meesho and more — all from a single dashboard.
-      </p>
+      <h1 class="hero-title">Sell Everywhere<br>With <span class="hl">One Upload</span></h1>
+      <p class="hero-subtitle">Upload your product once and distribute it automatically to Amazon, Flipkart, Meesho and more — all from a single dashboard.</p>
       <div class="hero-buttons">
         <a href="#dashboard" class="btn-primary">🚀 Start Selling</a>
         <a href="#how-it-works" class="btn-secondary">▶ Learn More</a>
       </div>
     </div>
     <div class="hero-right">
-      <div class="hero-illustration">
-        <div class="flow-diagram">
-          <div class="flow-merchant">
-            <div class="icon">🏪</div>
-            <div>Your Store</div>
-          </div>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-platform">
-            ⚡ MultiStore Hub
-          </div>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-marketplaces">
-            <div class="market-float-card">
-              <div class="dot" style="background:#f90;"></div>🛒 Amazon
-            </div>
-            <div class="market-float-card">
-              <div class="dot" style="background:#2ba4e2;"></div>🛍 Flipkart
-            </div>
-            <div class="market-float-card">
-              <div class="dot" style="background:#e82b2b;"></div>💜 Meesho
-            </div>
-            <div class="market-float-card">
-              <div class="dot" style="background:#96c149;"></div>🟢 Shopify
-            </div>
-          </div>
+      <div class="flow-diagram">
+        <div class="flow-merchant"><div class="icon">🏪</div><div>Your Store</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-platform">⚡ MultiStore Hub</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-markets">
+          <div class="mcard"><div class="dot" style="background:#f90"></div>🛒 Amazon</div>
+          <div class="mcard"><div class="dot" style="background:#2ba4e2"></div>🛍 Flipkart</div>
+          <div class="mcard"><div class="dot" style="background:#e82b2b"></div>💜 Meesho</div>
+          <div class="mcard"><div class="dot" style="background:#96c149"></div>🟢 Shopify</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ─── STATS BANNER ─── -->
 <div class="stats-banner">
-  <div class="stats-banner-inner">
-    <div>
-      <div class="banner-stat-value">50K+</div>
-      <div class="banner-stat-label">Active Merchants</div>
-    </div>
-    <div>
-      <div class="banner-stat-value">12M+</div>
-      <div class="banner-stat-label">Products Listed</div>
-    </div>
-    <div>
-      <div class="banner-stat-value">₹240Cr+</div>
-      <div class="banner-stat-label">GMV Processed</div>
-    </div>
-    <div>
-      <div class="banner-stat-value">99.9%</div>
-      <div class="banner-stat-label">Platform Uptime</div>
-    </div>
+  <div class="stats-inner">
+    <div><div class="stat-val">50K+</div><div class="stat-lbl">Active Merchants</div></div>
+    <div><div class="stat-val">12M+</div><div class="stat-lbl">Products Listed</div></div>
+    <div><div class="stat-val">₹240Cr+</div><div class="stat-lbl">GMV Processed</div></div>
+    <div><div class="stat-val">99.9%</div><div class="stat-lbl">Platform Uptime</div></div>
   </div>
 </div>
 
-<!-- ─── FEATURES ─── -->
 <section id="features">
-  <div class="section-header">
-    <div class="section-badge">✦ Features</div>
-    <h2 class="section-title">Everything You Need to Scale</h2>
-    <p class="section-subtitle">Powerful tools built for modern multi-channel sellers who want to grow faster.</p>
-  </div>
+  <div class="sec-head"><div class="sec-badge">✦ Features</div><h2 class="sec-title">Everything You Need to Scale</h2><p class="sec-sub">Powerful tools built for modern multi-channel sellers who want to grow faster.</p></div>
   <div class="features-grid">
-    <div class="feature-card reveal">
-      <div class="feature-icon">📦</div>
-      <div class="feature-title">Single Product Upload</div>
-      <p class="feature-desc">Upload your product once with all details, images, and pricing. Our platform handles the rest — formatting and publishing to every marketplace instantly.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">🔄</div>
-      <div class="feature-title">Automatic Marketplace Sync</div>
-      <p class="feature-desc">Products are automatically sent and updated on Amazon, Flipkart, Meesho, and more. Changes propagate across all platforms in real time.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">Inventory Management</div>
-      <p class="feature-desc">Track your stock levels across all platforms from one place. Get alerts when inventory runs low and prevent overselling automatically.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">🗂️</div>
-      <div class="feature-title">Unified Order Dashboard</div>
-      <p class="feature-desc">View, manage, and fulfill all orders from different marketplaces in one consolidated dashboard. Simplify your operations dramatically.</p>
-    </div>
+    <div class="feature-card"><div class="feature-icon">📦</div><div class="feature-title">Single Product Upload</div><p class="feature-desc">Upload once with all details, images, and pricing. Our platform handles formatting and publishing to every marketplace instantly.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔄</div><div class="feature-title">Automatic Marketplace Sync</div><p class="feature-desc">Products are automatically sent and updated on Amazon, Flipkart, Meesho, and more. Changes propagate in real time.</p></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-title">Inventory Management</div><p class="feature-desc">Track stock levels across all platforms from one place. Get low-stock alerts and prevent overselling automatically.</p></div>
+    <div class="feature-card"><div class="feature-icon">🗂️</div><div class="feature-title">Unified Order Dashboard</div><p class="feature-desc">View, manage, and fulfill all orders from different marketplaces in one consolidated dashboard.</p></div>
   </div>
 </section>
 
-<!-- ─── HOW IT WORKS ─── -->
 <section id="how-it-works">
-  <div class="section-header">
-    <div class="section-badge">✦ Process</div>
-    <h2 class="section-title">How It Works</h2>
-    <p class="section-subtitle">Get your products live on all major marketplaces in three simple steps.</p>
-  </div>
-  <div class="steps-container container">
-    <div class="step-card reveal">
-      <div class="step-number"><span class="step-icon">📝</span></div>
-      <h3 class="step-title">Upload Your Product</h3>
-      <p class="step-desc">Add your product name, description, images, price, and category once on the MultiStore Hub platform. No repeated data entry.</p>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-number"><span class="step-icon">⚙️</span></div>
-      <h3 class="step-title">We Process & Format</h3>
-      <p class="step-desc">Our engine intelligently formats your product details to meet each marketplace's unique requirements, guidelines, and content policies.</p>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-number"><span class="step-icon">🚀</span></div>
-      <h3 class="step-title">Go Live Everywhere</h3>
-      <p class="step-desc">Your product is published live on Amazon, Flipkart, Meesho, eBay, and Shopify simultaneously. Start receiving orders from day one.</p>
-    </div>
+  <div class="sec-head"><div class="sec-badge">✦ Process</div><h2 class="sec-title">How It Works</h2><p class="sec-sub">Get your products live on all major marketplaces in three simple steps.</p></div>
+  <div class="steps-container">
+    <div class="step-card"><div class="step-num">📝</div><h3 class="step-title">Upload Your Product</h3><p class="step-desc">Add your product name, description, images, price, and category once. No repeated data entry.</p></div>
+    <div class="step-card"><div class="step-num">⚙️</div><h3 class="step-title">We Process & Format</h3><p class="step-desc">Our engine intelligently formats your product details to meet each marketplace's unique requirements.</p></div>
+    <div class="step-card"><div class="step-num">🚀</div><h3 class="step-title">Go Live Everywhere</h3><p class="step-desc">Your product is published on Amazon, Flipkart, Meesho, eBay, and Shopify simultaneously.</p></div>
   </div>
 </section>
 
-<!-- ─── DASHBOARD PREVIEW ─── -->
 <section id="dashboard">
-  <div class="section-header">
-    <div class="section-badge">✦ Dashboard</div>
-    <h2 class="section-title">Your Control Center</h2>
-    <p class="section-subtitle">A powerful yet simple dashboard to manage products, orders, and revenue across all your connected marketplaces.</p>
-  </div>
-  <div class="dashboard-wrap reveal">
-    <div class="dashboard-bar">
-      <div class="dot-red"></div>
-      <div class="dot-yellow"></div>
-      <div class="dot-green"></div>
-      <span class="bar-title">MultiStore Hub — Merchant Dashboard</span>
-    </div>
-    <div class="dashboard-body">
-      <div class="dashboard-stats">
+  <div class="sec-head"><div class="sec-badge">✦ Dashboard</div><h2 class="sec-title">Your Control Center</h2><p class="sec-sub">A powerful yet simple dashboard to manage products, orders, and revenue across all connected marketplaces.</p></div>
+  <div class="dash-wrap">
+    <div class="dash-bar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="bar-title">MultiStore Hub — Merchant Dashboard</span></div>
+    <div class="dash-body">
+      <div class="dash-stats">
         <div class="stats-title">📈 Overview</div>
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">📦</div>
-            <div class="stat-value">1,284</div>
-            <div class="stat-label">Total Products</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🛒</div>
-            <div class="stat-value">3,590</div>
-            <div class="stat-label">Orders This Month</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-value">₹8.4L</div>
-            <div class="stat-label">Revenue</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🔗</div>
-            <div class="stat-value">5</div>
-            <div class="stat-label">Connected Marketplaces</div>
-          </div>
+          <div class="stat-card"><div class="s-icon">📦</div><div class="s-val">1,284</div><div class="s-lbl">Total Products</div></div>
+          <div class="stat-card"><div class="s-icon">🛒</div><div class="s-val">3,590</div><div class="s-lbl">Orders This Month</div></div>
+          <div class="stat-card"><div class="s-icon">💰</div><div class="s-val">₹8.4L</div><div class="s-lbl">Revenue</div></div>
+          <div class="stat-card"><div class="s-icon">🔗</div><div class="s-val">5</div><div class="s-lbl">Connected Marketplaces</div></div>
         </div>
         <div class="stats-title">🏬 Active Marketplaces</div>
-        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-          <span style="padding:0.35rem 0.8rem; background:rgba(249,148,0,0.1); border:1px solid rgba(249,148,0,0.3); border-radius:8px; font-size:0.78rem; font-weight:600; color:#f9a800;">🛒 Amazon</span>
-          <span style="padding:0.35rem 0.8rem; background:rgba(43,164,226,0.1); border:1px solid rgba(43,164,226,0.3); border-radius:8px; font-size:0.78rem; font-weight:600; color:#2ba4e2;">🛍 Flipkart</span>
-          <span style="padding:0.35rem 0.8rem; background:rgba(232,43,43,0.1); border:1px solid rgba(232,43,43,0.3); border-radius:8px; font-size:0.78rem; font-weight:600; color:#e82b2b;">💜 Meesho</span>
-          <span style="padding:0.35rem 0.8rem; background:rgba(0,117,211,0.1); border:1px solid rgba(0,117,211,0.3); border-radius:8px; font-size:0.78rem; font-weight:600; color:#0075d3;">🔵 eBay</span>
-          <span style="padding:0.35rem 0.8rem; background:rgba(150,193,73,0.1); border:1px solid rgba(150,193,73,0.3); border-radius:8px; font-size:0.78rem; font-weight:600; color:#96c149;">🟢 Shopify</span>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+          <span style="padding:0.35rem 0.8rem;background:rgba(249,148,0,0.1);border:1px solid rgba(249,148,0,0.3);border-radius:8px;font-size:0.78rem;font-weight:600;color:#f9a800">🛒 Amazon</span>
+          <span style="padding:0.35rem 0.8rem;background:rgba(43,164,226,0.1);border:1px solid rgba(43,164,226,0.3);border-radius:8px;font-size:0.78rem;font-weight:600;color:#2ba4e2">🛍 Flipkart</span>
+          <span style="padding:0.35rem 0.8rem;background:rgba(232,43,43,0.1);border:1px solid rgba(232,43,43,0.3);border-radius:8px;font-size:0.78rem;font-weight:600;color:#e82b2b">💜 Meesho</span>
+          <span style="padding:0.35rem 0.8rem;background:rgba(0,117,211,0.1);border:1px solid rgba(0,117,211,0.3);border-radius:8px;font-size:0.78rem;font-weight:600;color:#0075d3">🔵 eBay</span>
+          <span style="padding:0.35rem 0.8rem;background:rgba(150,193,73,0.1);border:1px solid rgba(150,193,73,0.3);border-radius:8px;font-size:0.78rem;font-weight:600;color:#96c149">🟢 Shopify</span>
         </div>
       </div>
-      <div class="dashboard-form">
+      <div class="dash-form">
         <div class="form-title">📤 Upload New Product</div>
-        <form id="productForm" onsubmit="handleProductUpload(event)">
-          <div class="form-group">
-            <label>Product Name *</label>
-            <input type="text" id="pName" placeholder="e.g. Premium Cotton T-Shirt">
-            <div class="error-msg" id="pNameErr">Please enter a product name.</div>
-          </div>
+        <form>
+          <div class="form-group"><label>Product Name</label><input type="text" placeholder="e.g. Premium Cotton T-Shirt"></div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Price (₹) *</label>
-              <input type="number" id="pPrice" placeholder="999">
-              <div class="error-msg" id="pPriceErr">Enter a valid price.</div>
-            </div>
-            <div class="form-group">
-              <label>Category *</label>
-              <select id="pCat">
-                <option value="">Select Category</option>
-                <option>Fashion & Apparel</option>
-                <option>Electronics</option>
-                <option>Home & Kitchen</option>
-                <option>Beauty & Personal Care</option>
-                <option>Sports & Fitness</option>
-                <option>Books</option>
-                <option>Toys & Games</option>
-              </select>
-              <div class="error-msg" id="pCatErr">Please select a category.</div>
+            <div class="form-group"><label>Price (₹)</label><input type="number" placeholder="999"></div>
+            <div class="form-group"><label>Category</label>
+              <select><option value="">Select Category</option><option>Fashion & Apparel</option><option>Electronics</option><option>Home & Kitchen</option><option>Beauty & Personal Care</option><option>Sports & Fitness</option><option>Books</option><option>Toys & Games</option></select>
             </div>
           </div>
-          <div class="form-group">
-            <label>Product Description *</label>
-            <textarea id="pDesc" placeholder="Describe your product features, materials, specifications..."></textarea>
-            <div class="error-msg" id="pDescErr">Please add a description.</div>
-          </div>
-          <div class="form-group">
-            <button type="button" class="upload-btn" onclick="simulateUpload(this)">
-              📷 Upload Product Image
-            </button>
-          </div>
+          <div class="form-group"><label>Product Description</label><textarea placeholder="Describe your product features, materials, specifications..."></textarea></div>
+          <div class="form-group"><button type="button" class="upload-btn">📷 Upload Product Image</button></div>
           <button type="submit" class="submit-btn">⚡ Upload & Distribute to All Marketplaces</button>
         </form>
       </div>
@@ -1551,179 +316,52 @@
   </div>
 </section>
 
-<!-- ─── INTEGRATIONS ─── -->
 <section id="integrations">
-  <div class="section-header">
-    <div class="section-badge">✦ Integrations</div>
-    <h2 class="section-title">Connected Marketplaces</h2>
-    <p class="section-subtitle">Sell on all major platforms with one click. We handle the technical integrations so you don't have to.</p>
-  </div>
-  <div class="integrations-grid reveal">
-    <div class="integration-card">
-      <div class="integration-logo">🛒</div>
-      <div class="integration-name">Amazon</div>
-    </div>
-    <div class="integration-card">
-      <div class="integration-logo">🛍️</div>
-      <div class="integration-name">Flipkart</div>
-    </div>
-    <div class="integration-card">
-      <div class="integration-logo">💜</div>
-      <div class="integration-name">Meesho</div>
-    </div>
-    <div class="integration-card">
-      <div class="integration-logo">🔵</div>
-      <div class="integration-name">eBay</div>
-    </div>
-    <div class="integration-card">
-      <div class="integration-logo">🟢</div>
-      <div class="integration-name">Shopify</div>
-    </div>
+  <div class="sec-head"><div class="sec-badge">✦ Integrations</div><h2 class="sec-title">Connected Marketplaces</h2><p class="sec-sub">Sell on all major platforms with one click. We handle the technical integrations so you don't have to.</p></div>
+  <div class="integ-grid">
+    <div class="integ-card"><span style="font-size:1.8rem">🛒</span><span>Amazon</span></div>
+    <div class="integ-card"><span style="font-size:1.8rem">🛍️</span><span>Flipkart</span></div>
+    <div class="integ-card"><span style="font-size:1.8rem">💜</span><span>Meesho</span></div>
+    <div class="integ-card"><span style="font-size:1.8rem">🔵</span><span>eBay</span></div>
+    <div class="integ-card"><span style="font-size:1.8rem">🟢</span><span>Shopify</span></div>
   </div>
 </section>
 
-<!-- ─── TESTIMONIALS ─── -->
 <section id="testimonials">
-  <div class="section-header">
-    <div class="section-badge">✦ Merchants</div>
-    <h2 class="section-title">Trusted by Sellers Across India</h2>
-    <p class="section-subtitle">See how MultiStore Hub helped real merchants scale their online business.</p>
-  </div>
-  <div class="testimonials-grid container">
-    <div class="testimonial-card reveal">
-      <div class="quote-mark">"</div>
-      <p class="testimonial-text">Before MultiStore Hub, I was spending 4 hours a day manually listing products on different platforms. Now it takes 10 minutes. My sales tripled in just 3 months because my products reach so many more buyers.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">RK</div>
-        <div>
-          <div class="stars">★★★★★</div>
-          <div class="author-name">Rajesh Kumar</div>
-          <div class="author-biz">📦 Electronics Retailer, Delhi</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card reveal">
-      <div class="quote-mark">"</div>
-      <p class="testimonial-text">As a small fashion brand, getting listed on Amazon and Flipkart individually was overwhelming. MultiStore Hub made the entire process seamless. The unified order dashboard alone saves my team hours every week.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">SP</div>
-        <div>
-          <div class="stars">★★★★★</div>
-          <div class="author-name">Sneha Patel</div>
-          <div class="author-biz">👗 Fashion Brand, Surat</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card reveal">
-      <div class="quote-mark">"</div>
-      <p class="testimonial-text">Inventory management across 5 platforms was a nightmare. MultiStore Hub solved it completely. I never oversell anymore and my business has expanded to Meesho and eBay with zero extra effort.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">AM</div>
-        <div>
-          <div class="stars">★★★★★</div>
-          <div class="author-name">Arjun Mehta</div>
-          <div class="author-biz">🏡 Home Decor Store, Mumbai</div>
-        </div>
-      </div>
-    </div>
+  <div class="sec-head"><div class="sec-badge">✦ Merchants</div><h2 class="sec-title">Trusted by Sellers Across India</h2><p class="sec-sub">See how MultiStore Hub helped real merchants scale their online business.</p></div>
+  <div class="test-grid">
+    <div class="test-card"><div class="quote">"</div><p class="test-text">Before MultiStore Hub, I was spending 4 hours a day manually listing products on different platforms. Now it takes 10 minutes. My sales tripled in just 3 months.</p><div class="test-author"><div class="avatar">RK</div><div><div class="stars">★★★★★</div><div class="author-name">Rajesh Kumar</div><div class="author-biz">📦 Electronics Retailer, Delhi</div></div></div></div>
+    <div class="test-card"><div class="quote">"</div><p class="test-text">As a small fashion brand, getting listed on Amazon and Flipkart was overwhelming. MultiStore Hub made it seamless. The unified order dashboard saves my team hours every week.</p><div class="test-author"><div class="avatar">SP</div><div><div class="stars">★★★★★</div><div class="author-name">Sneha Patel</div><div class="author-biz">👗 Fashion Brand, Surat</div></div></div></div>
+    <div class="test-card"><div class="quote">"</div><p class="test-text">Inventory management across 5 platforms was a nightmare. MultiStore Hub solved it completely. I never oversell anymore and expanded to Meesho and eBay with zero extra effort.</p><div class="test-author"><div class="avatar">AM</div><div><div class="stars">★★★★★</div><div class="author-name">Arjun Mehta</div><div class="author-biz">🏡 Home Decor Store, Mumbai</div></div></div></div>
   </div>
 </section>
 
-<!-- ─── PRICING ─── -->
 <section id="pricing">
-  <div class="section-header">
-    <div class="section-badge">✦ Pricing</div>
-    <h2 class="section-title">Simple, Transparent Pricing</h2>
-    <p class="section-subtitle">Choose the plan that fits your business. Upgrade or downgrade any time.</p>
-  </div>
-  <div class="pricing-grid container">
-    <div class="pricing-card reveal">
-      <div class="plan-icon">🌱</div>
-      <div class="plan-name">Starter</div>
-      <div class="plan-desc">Perfect for small merchants just getting started</div>
-      <div class="plan-price">
-        <span class="price-amount">₹499</span><span class="price-period">/month</span>
-      </div>
-      <ul class="plan-features">
-        <li>Up to 100 products</li>
-        <li>3 Marketplace connections</li>
-        <li>Basic inventory sync</li>
-        <li>Order dashboard</li>
-        <li>Email support</li>
-      </ul>
-      <button class="plan-btn">Get Started</button>
-    </div>
-    <div class="pricing-card popular reveal">
-      <div class="popular-badge">MOST POPULAR</div>
-      <div class="plan-icon">🚀</div>
-      <div class="plan-name">Business</div>
-      <div class="plan-desc">For growing stores scaling across platforms</div>
-      <div class="plan-price">
-        <span class="price-amount">₹1,499</span><span class="price-period">/month</span>
-      </div>
-      <ul class="plan-features">
-        <li>Up to 2,000 products</li>
-        <li>All 5 marketplaces</li>
-        <li>Real-time inventory sync</li>
-        <li>Advanced order dashboard</li>
-        <li>Analytics & reports</li>
-        <li>Priority support</li>
-      </ul>
-      <button class="plan-btn">Start Business Plan</button>
-    </div>
-    <div class="pricing-card reveal">
-      <div class="plan-icon">🏢</div>
-      <div class="plan-name">Enterprise</div>
-      <div class="plan-desc">For large sellers with high-volume needs</div>
-      <div class="plan-price">
-        <span class="price-amount">₹4,999</span><span class="price-period">/month</span>
-      </div>
-      <ul class="plan-features">
-        <li>Unlimited products</li>
-        <li>Unlimited marketplaces</li>
-        <li>API access</li>
-        <li>Dedicated account manager</li>
-        <li>Custom integrations</li>
-        <li>24/7 phone support</li>
-        <li>SLA guarantee</li>
-      </ul>
-      <button class="plan-btn">Contact Sales</button>
-    </div>
+  <div class="sec-head"><div class="sec-badge">✦ Pricing</div><h2 class="sec-title">Simple, Transparent Pricing</h2><p class="sec-sub">Choose the plan that fits your business. Upgrade or downgrade any time.</p></div>
+  <div class="price-grid">
+    <div class="price-card"><div class="plan-icon">🌱</div><div class="plan-name">Starter</div><div class="plan-desc">Perfect for small merchants just getting started</div><div class="plan-price"><span class="price-amt">₹499</span><span class="price-per">/month</span></div><ul class="plan-features"><li>Up to 100 products</li><li>3 Marketplace connections</li><li>Basic inventory sync</li><li>Order dashboard</li><li>Email support</li></ul><button class="plan-btn">Get Started</button></div>
+    <div class="price-card popular"><div class="pop-badge">MOST POPULAR</div><div class="plan-icon">🚀</div><div class="plan-name">Business</div><div class="plan-desc">For growing stores scaling across platforms</div><div class="plan-price"><span class="price-amt">₹1,499</span><span class="price-per">/month</span></div><ul class="plan-features"><li>Up to 2,000 products</li><li>All 5 marketplaces</li><li>Real-time inventory sync</li><li>Advanced order dashboard</li><li>Analytics & reports</li><li>Priority support</li></ul><button class="plan-btn">Start Business Plan</button></div>
+    <div class="price-card"><div class="plan-icon">🏢</div><div class="plan-name">Enterprise</div><div class="plan-desc">For large sellers with high-volume needs</div><div class="plan-price"><span class="price-amt">₹4,999</span><span class="price-per">/month</span></div><ul class="plan-features"><li>Unlimited products</li><li>Unlimited marketplaces</li><li>API access</li><li>Dedicated account manager</li><li>Custom integrations</li><li>24/7 phone support</li><li>SLA guarantee</li></ul><button class="plan-btn">Contact Sales</button></div>
   </div>
 </section>
 
-<!-- ─── CONTACT ─── -->
 <section id="contact">
-  <div class="section-header">
-    <div class="section-badge">✦ Contact</div>
-    <h2 class="section-title">Get In Touch</h2>
-    <p class="section-subtitle">Have a question? Our team is happy to help you get started with MultiStore Hub.</p>
-  </div>
-  <div class="contact-wrap reveal">
-    <form id="contactForm" class="contact-fields" onsubmit="handleContact(event)">
-      <div>
-        <input type="text" id="cName" placeholder="Your Name *">
-        <div class="error-msg" id="cNameErr">Please enter your name.</div>
-      </div>
-      <div>
-        <input type="email" id="cEmail" placeholder="Your Email *">
-        <div class="error-msg" id="cEmailErr">Please enter a valid email.</div>
-      </div>
-      <div>
-        <textarea id="cMsg" placeholder="Your Message *"></textarea>
-        <div class="error-msg" id="cMsgErr">Please write a message.</div>
-      </div>
+  <div class="sec-head"><div class="sec-badge">✦ Contact</div><h2 class="sec-title">Get In Touch</h2><p class="sec-sub">Have a question? Our team is happy to help you get started with MultiStore Hub.</p></div>
+  <div class="contact-wrap">
+    <form class="contact-fields">
+      <input type="text" id="cName" placeholder="Your Name *">
+      <input type="email" id="cEmail" placeholder="Your Email *">
+      <textarea id="cMsg" placeholder="Your Message *"></textarea>
       <button type="submit" class="contact-submit">Send Message →</button>
     </form>
   </div>
 </section>
 
-<!-- ─── FOOTER ─── -->
 <footer>
   <div class="footer-content">
     <div class="footer-brand">
-      <span class="nav-logo">MultiStore<span style="-webkit-text-fill-color:#fff;color:#fff"> Hub</span></span>
-      <p class="footer-tagline">The all-in-one platform that connects your products to every major e-commerce marketplace with a single upload.</p>
+      <span class="nav-logo">MultiStore<span style="color:#fff"> Hub</span></span>
+      <p class="footer-tag">The all-in-one platform that connects your products to every major e-commerce marketplace with a single upload.</p>
       <div class="social-links">
         <a href="#" class="social-link" title="Twitter">𝕏</a>
         <a href="#" class="social-link" title="LinkedIn">in</a>
@@ -1731,191 +369,68 @@
         <a href="#" class="social-link" title="YouTube">▶</a>
       </div>
     </div>
-    <div class="footer-col">
-      <h4>Product</h4>
-      <ul>
-        <li><a href="#">Features</a></li>
-        <li><a href="#">Pricing</a></li>
-        <li><a href="#">Integrations</a></li>
-        <li><a href="#">API Docs</a></li>
-        <li><a href="#">Changelog</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <ul>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Careers</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">Press Kit</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Legal</h4>
-      <ul>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Service</a></li>
-        <li><a href="#">Cookie Policy</a></li>
-        <li><a href="#">Refund Policy</a></li>
-      </ul>
-    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#">Pricing</a></li><li><a href="#">Integrations</a></li><li><a href="#">API Docs</a></li><li><a href="#">Changelog</a></li></ul></div>
+    <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Blog</a></li><li><a href="#">Press Kit</a></li><li><a href="#">Contact</a></li></ul></div>
+    <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Cookie Policy</a></li><li><a href="#">Refund Policy</a></li></ul></div>
   </div>
-  <div class="footer-bottom">
-    <span>© 2026 MultiStore Hub. All rights reserved.</span>
-    <span>Made with ❤️ in India</span>
-  </div>
+  <div class="footer-bottom"><span>© 2026 MultiStore Hub. All rights reserved.</span><span>Made with ❤️ in India</span></div>
 </footer>
 
 <script>
-  // ─── MOBILE MENU TOGGLE ───
-  function toggleMenu() {
-    var menu = document.getElementById('mobileMenu');
-    if (menu.classList.contains('open')) {
-      menu.classList.remove('open');
-    } else {
-      menu.classList.add('open');
-    }
-  }
+  // 1. Highlight active nav link on scroll
+  var sections = document.querySelectorAll('section[id]');
+  var navLinks = document.querySelectorAll('.nav-links a');
 
-  function closeMenu() {
-    document.getElementById('mobileMenu').classList.remove('open');
-  }
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY;
 
-  // ─── SCROLL REVEAL ───
-  // Watch elements and add 'visible' class when they enter the viewport
-  var revealElements = document.querySelectorAll('.reveal, .step-card, .testimonial-card, .pricing-card');
-
-  var observer = new IntersectionObserver(function(entries) {
-    for (var i = 0; i < entries.length; i++) {
-      if (entries[i].isIntersecting) {
-        entries[i].target.classList.add('visible');
+    sections.forEach(function(section) {
+      if (scrollY >= section.offsetTop - 100) {
+        navLinks.forEach(function(link) {
+          link.style.color = '';
+        });
+        var active = document.querySelector('.nav-links a[href="#' + section.id + '"]');
+        if (active) active.style.color = '#2563eb';
       }
-    }
-  }, { threshold: 0.12 });
+    });
+  });
 
-  for (var i = 0; i < revealElements.length; i++) {
-    observer.observe(revealElements[i]);
-  }
-
-  // ─── TOAST NOTIFICATION ───
-  function showToast() {
-    var toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(function() {
-      toast.classList.remove('show');
-    }, 4000);
-  }
-
-  // ─── PRODUCT UPLOAD FORM ───
-  function handleProductUpload(e) {
+  // 2. Contact form validation + success message
+  document.querySelector('.contact-fields').addEventListener('submit', function(e) {
     e.preventDefault();
-
-    var name  = document.getElementById('pName').value.trim();
-    var price = document.getElementById('pPrice').value.trim();
-    var cat   = document.getElementById('pCat').value;
-    var desc  = document.getElementById('pDesc').value.trim();
-    var valid = true;
-
-    // Show or hide each error message
-    if (name === '') {
-      document.getElementById('pNameErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('pNameErr').classList.remove('show');
-    }
-
-    if (price === '' || isNaN(price) || Number(price) <= 0) {
-      document.getElementById('pPriceErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('pPriceErr').classList.remove('show');
-    }
-
-    if (cat === '') {
-      document.getElementById('pCatErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('pCatErr').classList.remove('show');
-    }
-
-    if (desc === '') {
-      document.getElementById('pDescErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('pDescErr').classList.remove('show');
-    }
-
-    if (valid) {
-      document.getElementById('productForm').reset();
-      showToast();
-    }
-  }
-
-  // ─── IMAGE UPLOAD BUTTON ───
-  function simulateUpload(btn) {
-    btn.textContent = '✅ Image Ready to Upload';
-    btn.style.borderColor = 'rgba(34,197,94,0.5)';
-    btn.style.color = '#22c55e';
-    btn.style.background = 'rgba(34,197,94,0.08)';
-  }
-
-  // ─── CONTACT FORM ───
-  function handleContact(e) {
-    e.preventDefault();
-
     var name  = document.getElementById('cName').value.trim();
     var email = document.getElementById('cEmail').value.trim();
     var msg   = document.getElementById('cMsg').value.trim();
-    var valid = true;
 
-    // Simple email check – must contain @ and a dot after it
-    var emailValid = email.indexOf('@') > 0 && email.indexOf('.', email.indexOf('@')) > 0;
-
-    if (name === '') {
-      document.getElementById('cNameErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('cNameErr').classList.remove('show');
+    if (!name || !email || !msg) {
+      alert('Please fill in all fields.');
+      return;
     }
 
-    if (email === '' || !emailValid) {
-      document.getElementById('cEmailErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('cEmailErr').classList.remove('show');
-    }
+    var btn = this.querySelector('.contact-submit');
+    btn.textContent = '✅ Message Sent!';
+    btn.style.background = '#16a34a';
+    this.reset();
 
-    if (msg === '') {
-      document.getElementById('cMsgErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('cMsgErr').classList.remove('show');
-    }
+    setTimeout(function() {
+      btn.textContent = 'Send Message →';
+      btn.style.background = '';
+    }, 3000);
+  });
 
-    if (valid) {
-      document.getElementById('contactForm').reset();
-      var btn = document.querySelector('.contact-submit');
-      btn.textContent = '✅ Message Sent!';
-      btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
-      setTimeout(function() {
-        btn.textContent = 'Send Message →';
-        btn.style.background = '';
-      }, 3500);
-    }
-  }
+  // 3. "Back to top" button — appears after scrolling down
+  var topBtn = document.createElement('button');
+  topBtn.textContent = '↑';
+  topBtn.style.cssText = 'position:fixed;bottom:2rem;right:2rem;padding:0.6rem 1rem;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:1rem;cursor:pointer;display:none;z-index:999';
+  document.body.appendChild(topBtn);
 
-  // ─── CLEAR ERROR MESSAGES AS USER TYPES ───
-  var inputs = document.querySelectorAll('input, select, textarea');
-  for (var j = 0; j < inputs.length; j++) {
-    inputs[j].addEventListener('input', function() {
-      var errEl = document.getElementById(this.id + 'Err');
-      if (errEl) {
-        errEl.classList.remove('show');
-      }
-    });
-  }
+  window.addEventListener('scroll', function() {
+    topBtn.style.display = window.scrollY > 400 ? 'block' : 'none';
+  });
+
+  topBtn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 </script>
-
 </body>
 </html>
